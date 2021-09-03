@@ -1,0 +1,83 @@
+.multipleSelectionDialog
+  position absolute
+  top 50vh
+  left 100%
+  z-index 9
+  transform translateY(-50%)
+  color $ui-text-color
+  background-color $ui-noteList-backgroundColor
+  padding 1em
+
+  box-shadow 2px 12px 15px 2px rgba(0, 0, 0, 0.1), 2px 1px 50px 2px rgba(0, 0, 0, 0.1)
+  h3
+    font-size 1.5em
+    text-align center
+ .row
+    display flex
+    justify-content space-between
+    .button-box
+      display flex
+      margin 0.5em
+      margin-bottom 0
+    button
+      position relative
+      &:hover .tooltip
+        opacity 1
+
+      color $ui-text-color
+      background-color inherit
+      border none
+
+      font-size 24px
+      padding 0.5em
+      img
+        height 1em
+    input
+      background-color inherit
+      border 2px solid $ui-text-color
+      color inherit
+      margin 0.5em
+      padding 0 0.5em
+      width 100%
+      border-radius 5px
+   .input-button
+     border 2px solid $ui-text-color
+
+.tooltip
+  tooltip()
+  position absolute
+  pointer-events none
+  white-space nowrap
+  top 100%
+  left 50%
+  transform translateX(-50%)
+  z-index 200
+  padding 5px
+  line-height normal
+  border-radius 2px
+  opacity 0
+  transition 0.1s
+
+.tooltip:lang(ja)
+  @extend .tooltip
+  right 46px
+
+apply-theme(theme)
+  body[data-theme={theme}]
+    .multipleSelectionDialog
+      color get-theme-var(theme, 'text-color')
+      background-color get-theme-var(theme, 'noteList-backgroundColor')
+      .row
+        button
+          color get-theme-var(theme, 'text-color')
+          background-color get-theme-var(theme, 'noteList-backgroundColor')
+        input
+          border-color get-theme-var(theme, 'text-color')
+       .input-button
+          border-color get-theme-var(theme, 'text-color')
+
+for theme in 'dark' 'solarized-dark' 'dracula'
+  apply-theme(theme)
+
+for theme in $themes
+  apply-theme(theme)

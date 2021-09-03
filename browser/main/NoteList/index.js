@@ -9,6 +9,7 @@ import ee from 'browser/main/lib/eventEmitter'
 import dataApi from 'browser/main/lib/dataApi'
 import attachmentManagement from 'browser/main/lib/dataApi/attachmentManagement'
 import ConfigManager from 'browser/main/lib/ConfigManager'
+import MultipleSelectionDialog from './MultipleSelectionDialog'
 import NoteItem from 'browser/components/NoteItem'
 import NoteItemSimple from 'browser/components/NoteItemSimple'
 import searchFromNotes from 'browser/lib/search'
@@ -94,7 +95,16 @@ class NoteList extends React.Component {
     this.cloneNote = this.cloneNote.bind(this)
     this.deleteNote = this.deleteNote.bind(this)
     this.focusNote = this.focusNote.bind(this)
-    this.pinToTop = this.pinToTop.bind(this)
+    this.togglePinToTop = this.togglePinToTop.bind(this) // pin if unpined, unpin if pinned
+    this.pinToTop = this.pinToTop.bind(this) // pin all selected
+    this.unPin = this.unPin.bind(this) // unpin all selected
+    this.star = this.star.bind(this)
+    this.unStar = this.unStar.bind(this)
+    this.trash = this.trash.bind(this)
+    this.permanentlyDelete = this.permanentlyDelete.bind(this)
+    this.exportAllSelected = this.exportAllSelected.bind(this)
+    this.addTag = this.addTag.bind(this)
+    this.removeTag = this.removeTag.bind(this)
     this.getNoteStorage = this.getNoteStorage.bind(this)
     this.getNoteFolder = this.getNoteFolder.bind(this)
     this.getViewType = this.getViewType.bind(this)
@@ -667,6 +677,97 @@ class NoteList extends React.Component {
     })
   }
 
+  exportAllSelected(e, fileType) {
+    // Select directory
+    // trying export all notes one by one
+    // if a file already exists, ask resolution method [replace, replace all, skip, skip all, quit]
+    // replace all: replace all conflicting files
+    // skip all: skip all conflicting files
+    const options = {
+      title: i18n.__('Select folder for the exports'),
+      properties: ['openDirectory', 'createDirectory']
+    }
+
+    // Find the target folder
+    dialog.showOpenDialog(remote.getCurrentWindow(), options, folderPaths => {
+      if (folderPaths) {
+        // To show succesful and un-succesful attempts
+        let replaceAll = false
+        let skipAll = false
+
+        // Export each note one by one
+        const folderPath = folderPaths[0]
+        const { selectedNoteKeys } = this.state
+        selectedNoteKeys.every(noteKey => {
+          // Find the name
+          const note = findNoteByKey(this.notes, noteKey)
+          // generate full path and add extensions to
+          const filename =
+            filenamify(note.title, { replacement: '_' }) + `.${fileType}`
+          const filepath = path.join(folderPath, filename)
+
+          if (fs.existsSync(filepath)) {
+            if (skipAll) {
+              return
+            } else if (replaceAll) {
+              // pass through, file will be over-written
+            } else {
+              const options = {
+                buttons: [
+                  // if you change the order, change switch(response) too
+                  i18n.__('Replace'),
+                  i18n.__('Replace All'),
+                  i18n.__('Skip'),
+                  i18n.__('Skip All'),
+                  i18n.__('Abort')
+                ],
+                message: `${filename} ${i18n.__(
+                  'already exists in selected folder.'
+                )}`
+              }
+              const response = dialog.showMessageBox(
+                remote.getCurrentWindow(),
+                options
+              )
+              switch (response) {
+                case 0:
+                  // do nothing file will be over-written
+                  break
+                case 1:
+                  replaceAll = true
+                  break
+                case 2:
+                  return true // return to skip to next item in mapped array
+                case 3:
+                  skipAll = true
+                  return true
+                case 4:
+                  return false // break out of for each
+              }
+            }
+          }
+
+          const { config } = this.props
+          dataApi
+            .exportNoteAs(note, filepath, fileType, config)
+            .then(res => {
+              console.log(
+                `${filepath} ${i18n.__('was exported successsfully')}`
+              )
+            })
+            .catch(err => {
+              console.log(
+                `${i18n.__('Error while expoting')} ${filepath} : ${
+                  err ? err.message || err : 'Unexpected error during export'
+                }`
+              )
+            })
+          return true
+        })
+      }
+    })
+  }
+
   handleNoteContextMenu(e, uniqueKey) {
     const { location } = this.props
     const { selectedNoteKeys } = this.state
@@ -705,7 +806,7 @@ class NoteList extends React.Component {
       if (!location.pathname.match(/\/starred/)) {
         templates.push({
           label: pinLabel,
-          click: this.pinToTop
+          click: this.togglePinToTop
         })
       }
       templates.push(
@@ -813,11 +914,132 @@ class NoteList extends React.Component {
     }
   }
 
-  pinToTop() {
+  togglePinToTop() {
     this.updateSelectedNotes(note => {
       note.isPinned = !note.isPinned
       return note
     })
+  }
+
+  pinToTop() {
+    this.updateSelectedNotes(note => {
+      note.isPinned = true
+      return note
+    })
+  }
+
+  unPin() {
+    this.updateSelectedNotes(note => {
+      note.isPinned = false
+      return note
+    })
+  }
+
+  star() {
+    this.updateSelectedNotes(note => {
+      note.isStarred = true
+      return note
+    })
+  }
+
+  unStar() {
+    this.updateSelectedNotes(note => {
+      note.isStarred = false
+      return note
+    })
+  }
+
+  addTag(newTag) {
+    newTag = newTag.trim().replace(/ +/g, '_')
+    if (newTag.charAt(0) === '#') {
+      newTag.substring(1)
+    }
+
+    if (newTag.length <= 0) {
+      return
+    }
+
+    this.updateSelectedNotes(note => {
+      note.tags = _.isArray(note.tags) ? note.tags.slice() : []
+
+      if (!_.includes(note.tags, newTag)) {
+        note.tags.push(newTag)
+      }
+      return note
+    })
+  }
+
+  removeTag(tagname) {
+    this.updateSelectedNotes(note => {
+      note.tags = _.isArray(note.tags) ? note.tags.slice() : []
+      note.tags.splice(note.tags.indexOf(tagname), 1)
+      return note
+    })
+  }
+
+  trash() {
+    const { dispatch } = this.props
+    const { selectedNoteKeys } = this.state
+    const notes = this.notes.map(note => Object.assign({}, note))
+    const selectedNotes = findNotesByKeys(notes, selectedNoteKeys)
+    const { confirmDeletion } = this.props.config.ui
+
+    if (!confirmDeleteNote(confirmDeletion, false)) return
+
+    Promise.all(
+      selectedNotes.map(note => {
+        note.isTrashed = true
+
+        return dataApi.updateNote(note.storage, note.key, note)
+      })
+    )
+      .then(newNotes => {
+        newNotes.forEach(newNote => {
+          dispatch({
+            type: 'UPDATE_NOTE',
+            note: newNote
+          })
+        })
+        AwsMobileAnalyticsConfig.recordDynamicCustomEvent('EDIT_NOTE')
+      })
+      .then(() => ee.emit('list:next'))
+      .catch(err => {
+        console.error('Notes could not go to trash: ' + err)
+      })
+    this.setState({ selectedNoteKeys: [] })
+  }
+
+  permanentlyDelete() {
+    const { dispatch } = this.props
+    const { selectedNoteKeys } = this.state
+    const notes = this.notes.map(note => Object.assign({}, note))
+    const selectedNotes = findNotesByKeys(notes, selectedNoteKeys)
+    const { confirmDeletion } = this.props.config.ui
+
+    if (!confirmDeleteNote(confirmDeletion, true)) return
+
+    Promise.all(
+      selectedNotes.map(note => {
+        return dataApi.deleteNote(note.storage, note.key)
+      })
+    )
+      .then(data => {
+        const dispatchHandler = () => {
+          data.forEach(item => {
+            dispatch({
+              type: 'DELETE_NOTE',
+              storageKey: item.storageKey,
+              noteKey: item.noteKey
+            })
+          })
+        }
+        ee.once('list:next', dispatchHandler)
+      })
+      .then(() => ee.emit('list:next'))
+      .catch(err => {
+        console.error('Cannot Delete note: ' + err)
+      })
+    this.setState({ selectedNoteKeys: [] })
   }
 
   restoreNote() {
@@ -828,62 +1050,16 @@ class NoteList extends React.Component {
   }
 
   deleteNote() {
-    const { dispatch } = this.props
     const { selectedNoteKeys } = this.state
     const notes = this.notes.map(note => Object.assign({}, note))
     const selectedNotes = findNotesByKeys(notes, selectedNoteKeys)
     const firstNote = selectedNotes[0]
-    const { confirmDeletion } = this.props.config.ui
 
     if (firstNote.isTrashed) {
-      if (!confirmDeleteNote(confirmDeletion, true)) return
-
-      Promise.all(
-        selectedNotes.map(note => {
-          return dataApi.deleteNote(note.storage, note.key)
-        })
-      )
-        .then(data => {
-          const dispatchHandler = () => {
-            data.forEach(item => {
-              dispatch({
-                type: 'DELETE_NOTE',
-                storageKey: item.storageKey,
-                noteKey: item.noteKey
-              })
-            })
-          }
-          ee.once('list:next', dispatchHandler)
-        })
-        .then(() => ee.emit('list:next'))
-        .catch(err => {
-          console.error('Cannot Delete note: ' + err)
-        })
+      this.permanentlyDelete()
     } else {
-      if (!confirmDeleteNote(confirmDeletion, false)) return
-
-      Promise.all(
-        selectedNotes.map(note => {
-          note.isTrashed = true
-
-          return dataApi.updateNote(note.storage, note.key, note)
-        })
-      )
-        .then(newNotes => {
-          newNotes.forEach(newNote => {
-            dispatch({
-              type: 'UPDATE_NOTE',
-              note: newNote
-            })
-          })
-          AwsMobileAnalyticsConfig.recordDynamicCustomEvent('EDIT_NOTE')
-        })
-        .then(() => ee.emit('list:next'))
-        .catch(err => {
-          console.error('Notes could not go to trash: ' + err)
-        })
+      this.trash()
     }
-    this.setState({ selectedNoteKeys: [] })
   }
 
   cloneNote() {
@@ -1391,6 +1567,19 @@ class NoteList extends React.Component {
         >
           {noteList}
         </div>
+        <MultipleSelectionDialog
+          nSelectedNotes={selectedNoteKeys.length}
+          addTag={this.addTag}
+          removeTag={this.removeTag}
+          onPin={this.pinToTop}
+          onUnPin={this.unPin}
+          onStar={this.star}
+          onUnStar={this.unStar}
+          onTrash={this.trash}
+          onDelete={this.permanentlyDelete}
+          onExport={this.exportAllSelected}
+          onPublish={this.publishMarkdown.bind(this)}
+        />
       </div>
     )
   }
