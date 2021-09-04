@@ -33,6 +33,7 @@ import markdownToc from 'browser/lib/markdown-toc-generator'
 import queryString from 'query-string'
 import { replace } from 'connected-react-router'
 import ToggleDirectionButton from 'browser/main/Detail/ToggleDirectionButton'
+import PreviewSearch from './PreviewSearch'
 
 class MarkdownNoteDetail extends React.Component {
   constructor(props) {
@@ -548,16 +549,29 @@ class MarkdownNoteDetail extends React.Component {
             />
           </div>
 
-          <TagSelect
-            ref='tags'
-            value={this.state.note.tags}
-            saveTagsAlphabetically={config.ui.saveTagsAlphabetically}
-            showTagsAlphabetically={config.ui.showTagsAlphabetically}
-            data={data}
-            dispatch={dispatch}
-            onChange={this.handleUpdateTag.bind(this)}
-            coloredTags={config.coloredTags}
-          />
+          <div styleName='info-extra'>
+            <div
+              styleName={`extra-part-${
+                this.state.editorType !== 'EDITOR_PREVIEW' ? 'half' : 'full'
+              }`}
+            >
+              <TagSelect
+                ref='tags'
+                value={this.state.note.tags}
+                saveTagsAlphabetically={config.ui.saveTagsAlphabetically}
+                showTagsAlphabetically={config.ui.showTagsAlphabetically}
+                data={data}
+                dispatch={dispatch}
+                onChange={this.handleUpdateTag.bind(this)}
+                coloredTags={config.coloredTags}
+              />
+            </div>
+            {this.state.editorType !== 'EDITOR_PREVIEW' && (
+              <div styleName='extra-part-half'>
+                <PreviewSearch />
+              </div>
+            )}
+          </div>
           <TodoListPercentage
             onClearCheckboxClick={e => this.handleClearTodo(e)}
             percentageOfTodo={getTodoPercentageOfCompleted(note.content)}
