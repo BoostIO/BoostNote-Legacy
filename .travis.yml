@@ -14,6 +14,7 @@ deploy:
   'on':
     branch: master
   provider: script
-  script: if [ ${TRAVIS_NODE_VERSION} = "stable" ];then docker run -v $(pwd):$(pwd) -t snapcore/snapcraft sh -c "apt update -qq
+  script:
+    if [ ${TRAVIS_NODE_VERSION} = "stable" ];then docker run -v $(pwd):$(pwd) -t snapcore/snapcraft sh -c "apt update -qq
     && cd $(pwd) && snapcraft && snapcraft push *.snap --release edge"; fi
   skip_cleanup: true

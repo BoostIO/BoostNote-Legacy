@@ -14,8 +14,8 @@ Please use Object Destructing whenever it's possible.
 
 // BAD
 import Code from 'library'
-const subCode = Code.subCode
-subCode()
+const subCode = Code.subCode;
+subCode();
 
 // GOOD
 import { subCode } from 'library'
@@ -43,7 +43,7 @@ This is actually not a "code style" but rather a requirement in every projects. 
 <h1 onclick={onClick}>Name</h1>
 
 // GOOD
-<h1 onclick={onNameClick}>Name</h1>
+<h1; onclick={onNameClick}>Name</h1>
 ```
 
 ### Don't write long conditional statement
@@ -54,8 +54,8 @@ When writing a conditional statement, if it's too long, cut it into small meanin
 if (note.type == 'markdown' && note.index == 2 && note.content.indexOf('string') != -1)
 
 // GOOD
-const isSecondMarkdownNote = note.type == 'markdown' && note.index == 2
-const isNoteHasString = note.content.indexOf('string') != -1
+const isSecondMarkdownNote = note.type == 'markdown' && note.index == 2;
+const isNoteHasString = note.content.indexOf('string') != -1;
 if (isSecondMarkdownNote && isNoteHasString)
 ```
 
@@ -82,8 +82,8 @@ class MyComponent extends React.Component {
 ```
 
 ## React Hooks
-Existing code will be kept class-based and will only be changed to functional components with hooks if it improves readability or makes things more reusable. 
+Existing code will be kept class-based and will only be changed to functional components with hooks if it improves readability or makes things more reusable.
 
-For new components it's OK to use hooks with functional components but don't mix hooks & class-based components within a feature - just for code style / readability reasons. 
+For new components it's OK to use hooks with functional components but don't mix hooks & class-based components within a feature - just for code style / readability reasons.
 
 Read more about hooks in the [React hooks introduction](https://reactjs.org/docs/hooks-intro.html).

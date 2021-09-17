@@ -1,11 +1,19 @@
 {
-  "extends": ["standard", "standard-jsx", "plugin:react/recommended", "prettier"],
+  "extends": [
+    "standard",
+    "standard-jsx",
+    "plugin:react/recommended",
+    "prettier"
+  ],
   "plugins": ["react", "prettier"],
   "rules": {
     "no-useless-escape": 0,
-    "prefer-const": ["warn", {
-      "destructuring": "all"
-    }],
+    "prefer-const": [
+      "warn",
+      {
+        "destructuring": "all"
+      }
+    ],
     "no-unused-vars": "warn",
     "no-undef": "warn",
     "no-lone-blocks": "warn",

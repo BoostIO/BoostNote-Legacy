@@ -23,6 +23,7 @@ import { confirmDeleteNote } from 'browser/lib/confirmDeleteNote'
 import context from 'browser/lib/context'
 import filenamify from 'filenamify'
 import queryString from 'query-string'
+import { getNotes } from 'browser/lib/annotation-extractor'
 
 const { remote } = require('electron')
 const { dialog } = remote
@@ -87,6 +88,7 @@ class NoteList extends React.Component {
       this.alertIfSnippet(msg)
     }
     this.importFromFileHandler = this.importFromFile.bind(this)
+    this.importFromPdfHandler = this.importFromPdf.bind(this)
     this.jumpNoteByHash = this.jumpNoteByHashHandler.bind(this)
     this.handleNoteListKeyUp = this.handleNoteListKeyUp.bind(this)
     this.handleNoteListBlur = this.handleNoteListBlur.bind(this)
@@ -121,6 +123,7 @@ class NoteList extends React.Component {
     ee.on('list:focus', this.focusHandler)
     ee.on('list:isMarkdownNote', this.alertIfSnippetHandler)
     ee.on('import:file', this.importFromFileHandler)
+    ee.on('import:pdfComments', this.importFromPdfHandler)
     ee.on('list:jump', this.jumpNoteByHash)
     ee.on('list:navigate', this.navigate)
   }
@@ -144,6 +147,7 @@ class NoteList extends React.Component {
     ee.off('list:focus', this.focusHandler)
     ee.off('list:isMarkdownNote', this.alertIfSnippetHandler)
     ee.off('import:file', this.importFromFileHandler)
+    ee.off('import:pdfComments', this.importFromPdfHandler)
     ee.off('list:jump', this.jumpNoteByHash)
   }
 
@@ -1070,6 +1074,17 @@ class NoteList extends React.Component {
     })
   }
 
+  importFromPdf() {
+    const options = {
+      filters: [{ name: 'Documents', extensions: ['pdf'] }],
+      properties: ['openFile', 'multiSelections']
+    }
+
+    dialog.showOpenDialog(remote.getCurrentWindow(), options, filepaths => {
+      this.addNotesFromFiles(filepaths)
+    })
+  }
+
   handleDrop(e) {
     e.preventDefault()
     const { location } = this.props
@@ -1086,20 +1101,16 @@ class NoteList extends React.Component {
 
     if (filepaths === undefined) return
     filepaths.forEach(filepath => {
-      fs.readFile(filepath, (err, data) => {
-        if (err) throw Error('File reading error: ', err)
-
-        fs.stat(filepath, (err, { mtime, birthtime }) => {
-          if (err) throw Error('File stat reading error: ', err)
-
-          const content = data.toString()
+      if (path.extname(filepath) === '.pdf') {
+        getNotes(filepath).then(notes => {
+          const content = notes.join('\r\n\r\n')
           const newNote = {
             content: content,
             folder: folder.key,
             title: path.basename(filepath, path.extname(filepath)),
             type: 'MARKDOWN_NOTE',
-            createdAt: birthtime,
-            updatedAt: mtime
+            createdAt: new Date(),
+            updatedAt: new Date()
           }
           dataApi.createNote(storage.key, newNote).then(note => {
             attachmentManagement
@@ -1122,7 +1133,49 @@ class NoteList extends React.Component {
               })
           })
         })
-      })
+      } else {
+        fs.readFile(filepath, (err, data) => {
+          if (err) throw Error('File reading error: ', err)
+
+          fs.stat(filepath, (err, { mtime, birthtime }) => {
+            if (err) throw Error('File stat reading error: ', err)
+            const content = data.toString()
+            const newNote = {
+              content: content,
+              folder: folder.key,
+              title: path.basename(filepath, path.extname(filepath)),
+              type: 'MARKDOWN_NOTE',
+              createdAt: birthtime,
+              updatedAt: mtime
+            }
+            dataApi.createNote(storage.key, newNote).then(note => {
+              attachmentManagement
+                .importAttachments(
+                  note.content,
+                  filepath,
+                  storage.key,
+                  note.key
+                )
+                .then(newcontent => {
+                  note.content = newcontent
+
+                  dataApi.updateNote(storage.key, note.key, note)
+
+                  dispatch({
+                    type: 'UPDATE_NOTE',
+                    note: note
+                  })
+                  dispatch(
+                    push({
+                      pathname: location.pathname,
+                      search: queryString.stringify({ key: getNoteKey(note) })
+                    })
+                  )
+                })
+            })
+          })
+        })
+      }
     })
   }
 

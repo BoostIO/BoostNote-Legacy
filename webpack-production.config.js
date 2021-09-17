@@ -7,8 +7,15 @@ var config = Object.assign({}, skeleton, {
   module: {
     loaders: [
       {
+        test: /pdf(\.worker)?(\.min)?\.js\.map$/,
+        loader: 'raw-loader'
+      },
+      {
         test: /(\.js|\.jsx)?$/,
-        exclude: /(node_modules|bower_components)/,
+        exclude: [
+          /(node_modules|bower_components)/,
+          /pdf(\.worker)?(\.min)?\.js\.map$/
+        ],
         loader: 'babel'
       },
       {

@@ -146,14 +146,14 @@
   <script src="../node_modules/redux/dist/redux.min.js"></script>
   <script src="../node_modules/react-redux/dist/react-redux.min.js"></script>
   <script type='text/javascript'>
-    const electron = require('electron')
-    electron.webFrame.setVisualZoomLevelLimits(1, 1)
+    const electron = require('electron');
+    electron.webFrame.setVisualZoomLevelLimits(1, 1);
     var scriptUrl = window._.find(electron.remote.process.argv, (a) => a === '--hot')
       ? 'http://localhost:8080/assets/main.js'
-      : '../compiled/main.js'
-    var scriptEl = document.createElement('script')
-    scriptEl.setAttribute('type', 'text/javascript')
-    scriptEl.setAttribute('src', scriptUrl)
+      : '../compiled/main.js';
+    var scriptEl = document.createElement('script');
+    scriptEl.setAttribute('type', 'text/javascript');
+    scriptEl.setAttribute('src', scriptUrl);
     document.body.appendChild(scriptEl)
   </script>
   <style>
