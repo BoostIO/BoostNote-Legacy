@@ -760,6 +760,16 @@ body p {
     color: #000;
     background-color: #fff;
   }
+
+  table {
+    overflow-x: visible;
+    table-layout: fixed;
+  }
+
+  table tbody td {
+    word-break: break-word;
+  }
+
   .clipboardButton {
     display: none
   }
