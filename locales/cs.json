@@ -147,6 +147,7 @@
   "Albanian": "Albánština",
   "Chinese (zh-CN)": "Čínština (zjednodušená)",
   "Chinese (zh-TW)": "Čínština (tradiční)",
+  "Czech": "Čeština",
   "Danish": "Dánština",
   "Japanese": "Japonština",
   "Korean": "Korejština",
@@ -189,6 +190,8 @@
   "New notes are tagged with the filtering tags": "Nové poznámky jsou opatřeny štítky z filtru",
   "Show menu bar": "Zobrazit lištu menu",
   "Auto Detect": "Automatická detekce",
+  "Filter tags/folders...": "filtrovat štítky/složky...",
   "Enable HTML label in mermaid flowcharts": "Povolit HTML label v mermaid flowcharts ⚠ Tato možnost je potenciálním zdrojem XSS.",
-  "Wrap line in Snippet Note": "Ukončovat řádky v útržcích kódu"
+  "Wrap line in Snippet Note": "Ukončovat řádky v útržcích kódu",
+  "Enable Auto Update": "Povolit automatické aktualizace"
 }
