@@ -9290,9 +9290,10 @@ strip-outer@^1.0.0:
   dependencies:
     escape-string-regexp "^1.0.2"
 
-striptags@^2.2.1:
-  version "2.2.1"
-  resolved "https://registry.yarnpkg.com/striptags/-/striptags-2.2.1.tgz#4c450b708d41b8bf39cf24c49ff234fc6aabfd32"
+striptags@^3.2.0:
+  version "3.2.0"
+  resolved "https://registry.yarnpkg.com/striptags/-/striptags-3.2.0.tgz#cc74a137db2de8b0b9a370006334161f7dd67052"
+  integrity sha512-g45ZOGzHDMe2bdYMdIvdAfCQkCTDMGBazSw1ypMowwGIee7ZQ5dU0rBJ8Jqgl+jAKIv4dbeE1jscZq9wid1Tkw==
 
 style-loader@^0.12.4:
   version "0.12.4"
