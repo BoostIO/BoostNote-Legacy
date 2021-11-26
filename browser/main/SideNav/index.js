@@ -18,7 +18,7 @@ import PreferenceButton from './PreferenceButton'
 import SearchButton from './SearchButton'
 import ListButton from './ListButton'
 import TagButton from './TagButton'
-import { SortableContainer } from 'react-sortable-hoc'
+import { SortableContainer, SortableElement } from 'react-sortable-hoc'
 import i18n from 'browser/lib/i18n'
 import context from 'browser/lib/context'
 import { remote } from 'electron'
@@ -343,6 +343,13 @@ class SideNav extends React.Component {
     }
   }
 
+  onStorageSortEnd({ oldIndex, newIndex }) {
+    const { dispatch } = this.props
+    dataApi.reorderStorage(oldIndex, newIndex).then(data => {
+      dispatch({ type: 'REORDER_STORAGE', storages: data.storages })
+    })
+  }
+
   SideNavComponent(isFolded) {
     const { location, data, config, dispatch } = this.props
     const { showSearch, searchText } = this.state
@@ -350,6 +357,7 @@ class SideNav extends React.Component {
     const isHomeActive = !!location.pathname.match(/^\/home$/)
     const isStarredActive = !!location.pathname.match(/^\/starred$/)
     const isTrashedActive = !!location.pathname.match(/^\/trashed$/)
+    const SortableStorageList = SortableContainer(StorageList)
 
     let component
 
@@ -369,11 +377,17 @@ class SideNav extends React.Component {
         })
       }
 
+      let itemIndex = -1
+
       const storageList = storageMap.map((storage, key) => {
-        const SortableStorageItem = SortableContainer(StorageItem)
+        const SortableStorageItem = SortableElement(
+          SortableContainer(StorageItem)
+        )
+        itemIndex++
         return (
           <SortableStorageItem
             key={storage.key}
+            index={itemIndex}
             storage={storage}
             data={data}
             location={location}
@@ -406,7 +420,12 @@ class SideNav extends React.Component {
             )}
           />
 
-          <StorageList storageList={storageList} isFolded={isFolded} />
+          <SortableStorageList
+            storageList={storageList}
+            isFolded={isFolded}
+            onSortEnd={this.onStorageSortEnd.bind(this)}
+            useDragHandle
+          />
           <NavToggleButton
             isFolded={isFolded}
             handleToggleButtonClick={this.handleToggleButtonClick.bind(this)}

@@ -6,11 +6,7 @@ import React from 'react'
 import styles from './StorageItem.styl'
 import CSSModules from 'browser/lib/CSSModules'
 import _ from 'lodash'
-import { SortableHandle } from 'react-sortable-hoc'
-
-const DraggableIcon = SortableHandle(({ className }) => (
-  <i className={`fa ${className}`} />
-))
+import DraggableIcon from './DraggableIcon'
 
 const FolderIcon = ({ className, color, isActive }) => {
   const iconStyle = isActive ? 'fa-folder-open-o' : 'fa-folder-o'

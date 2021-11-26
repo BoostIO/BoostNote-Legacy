@@ -6,6 +6,8 @@ import consts from 'browser/lib/consts'
 import dataApi from 'browser/main/lib/dataApi'
 import { store } from 'browser/main/store'
 import FolderList from './FolderList'
+import Handle from './Handle'
+import { SortableHandle } from 'react-sortable-hoc'
 import i18n from 'browser/lib/i18n'
 
 const { shell, remote } = require('electron')
@@ -104,10 +106,14 @@ class StorageItem extends React.Component {
 
   render() {
     const { storage, hostBoundingBox } = this.props
+    const StyledHandle = CSSModules(Handle, this.props.styles)
+
+    const SortableStorageHandle = SortableHandle(StyledHandle)
 
     return (
       <div styleName='root' key={storage.key}>
         <div styleName='header'>
+          <SortableStorageHandle isHeader />
           {this.state.isLabelEditing ? (
             <div styleName='header-label--edit'>
               <input

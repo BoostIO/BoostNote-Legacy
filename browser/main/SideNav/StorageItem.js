@@ -7,6 +7,7 @@ import CreateFolderModal from 'browser/main/modals/CreateFolderModal'
 import RenameFolderModal from 'browser/main/modals/RenameFolderModal'
 import dataApi from 'browser/main/lib/dataApi'
 import StorageItemChild from 'browser/components/StorageItem'
+import DraggableIcon from 'browser/components/DraggableIcon'
 import _ from 'lodash'
 import { SortableElement } from 'react-sortable-hoc'
 import i18n from 'browser/lib/i18n'
@@ -409,6 +410,7 @@ class StorageItem extends React.Component {
           '$'
       )
     )
+    const StyledDraggableIcon = CSSModules(DraggableIcon, styles)
 
     return (
       <div styleName={isFolded ? 'root--folded' : 'root'} key={storage.key}>
@@ -416,8 +418,13 @@ class StorageItem extends React.Component {
           styleName={isActive ? 'header--active' : 'header'}
           onContextMenu={e => this.handleHeaderContextMenu(e)}
         >
+          {!isFolded && (
+            <StyledDraggableIcon className={styles['header-reorder']} />
+          )}
           <button
-            styleName='header-toggleButton'
+            styleName={
+              isFolded ? 'header-toggleButton--folded' : 'header-toggleButton'
+            }
             onMouseDown={e => this.handleToggleButtonClick(e)}
           >
             <img

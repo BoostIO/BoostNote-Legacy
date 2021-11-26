@@ -5,6 +5,7 @@ import styles from './StoragesTab.styl'
 import dataApi from 'browser/main/lib/dataApi'
 import attachmentManagement from 'browser/main/lib/dataApi/attachmentManagement'
 import StorageItem from './StorageItem'
+import { SortableContainer, SortableElement } from 'react-sortable-hoc'
 import i18n from 'browser/lib/i18n'
 import { humanFileSize } from 'browser/lib/utils'
 import fs from 'fs'
@@ -45,6 +46,7 @@ class StoragesTab extends React.Component {
       attachments: []
     }
     this.loadAttachmentStorage()
+    this.onSortEnd = this.onSortEnd.bind(this)
   }
 
   loadAttachmentStorage() {
@@ -94,6 +96,13 @@ class StoragesTab extends React.Component {
       .catch(console.error)
   }
 
+  onSortEnd({ oldIndex, newIndex }) {
+    const { dispatch } = this.props
+    dataApi.reorderStorage(oldIndex, newIndex).then(data => {
+      dispatch({ type: 'REORDER_STORAGE', storages: data.storages })
+    })
+  }
+
   renderList() {
     const { data, boundingBox } = this.props
     const { attachments } = this.state
@@ -130,23 +139,33 @@ class StoragesTab extends React.Component {
     if (!boundingBox) {
       return null
     }
+
+    let index = -1
+    const SortableStorageItem = SortableElement(StorageItem)
     const storageList = data.storageMap.map(storage => {
+      index++
       return (
-        <StorageItem
+        <SortableStorageItem
+          index={index}
           key={storage.key}
           storage={storage}
           hostBoundingBox={boundingBox}
         />
       )
     })
+
+    const ListContent = ({ storageList }) => <div>{storageList}</div>
+    const SortableListContent = SortableContainer(ListContent)
+
     return (
       <div styleName='list'>
         <div styleName='header'>{i18n.__('Storage Locations')}</div>
-        {storageList.length > 0 ? (
-          storageList
-        ) : (
-          <div styleName='list-empty'>{i18n.__('No storage found.')}</div>
-        )}
+        <SortableListContent
+          helperClass='sortableItemHelper'
+          storageList={storageList}
+          onSortEnd={this.onSortEnd}
+          useDragHandle
+        />
         <div styleName='list-control'>
           <button
             styleName='list-control-addStorageButton'

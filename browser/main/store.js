@@ -358,6 +358,13 @@ function data(state = defaultDataMap(), action) {
       action.storage.isOpen = action.isOpen
       state.storageMap.set(action.storage.key, action.storage)
       return state
+    case 'REORDER_STORAGE':
+      state = Object.assign({}, state)
+      state.storageMap = new Map()
+      action.storages.forEach(storage => {
+        state.storageMap.set(storage.key, storage)
+      })
+      return state
   }
   return state
 }

@@ -320,7 +320,7 @@ class SortableFolderItemComponent extends React.Component {
     return (
       <div>
         <DragHandle />
-        <StyledFolderItem {...this.props} />
+        <StyledFolderItem isHeader={false} {...this.props} />
       </div>
     )
   }
