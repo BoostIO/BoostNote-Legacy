@@ -203,6 +203,7 @@ class InfoTab extends React.Component {
                 styleName='subscription-email-input'
                 placeholder='E-mail'
                 type='email'
+                required
                 onChange={e => this.handleSubscriptionFormEmailChange(e)}
                 disabled={this.state.subscriptionFormStatus === 'sending'}
               />
