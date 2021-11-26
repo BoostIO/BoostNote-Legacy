@@ -120,7 +120,7 @@
     "react-transition-group": "^2.5.0",
     "redux": "^3.5.2",
     "sander": "^0.5.1",
-    "sanitize-html": "^1.18.2",
+    "sanitize-html": "^2.3.2",
     "striptags": "^2.2.1",
     "turndown": "^4.0.2",
     "turndown-plugin-gfm": "^1.0.2",
