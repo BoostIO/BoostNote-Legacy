@@ -75,7 +75,7 @@ class InfoPanel extends React.Component {
           <p styleName='infoPanel-sub'>{i18n.__('CREATION DATE')}</p>
         </div>
 
-        <div>
+        <div key={noteLink}>
           <input
             styleName='infoPanel-noteLink'
             ref='noteLink'
