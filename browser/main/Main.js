@@ -176,6 +176,20 @@ class Main extends React.Component {
       }
     })
 
+    const cbAddedOrChanged = note => {
+      dispatch({
+        type: 'UPDATE_NOTE',
+        note
+      })
+    }
+    const cbRemoved = noteKey => {
+      dispatch({
+        type: 'DELETE_NOTE',
+        noteKey
+      })
+    }
+    dataApi.addFSWatcherCallback(cbAddedOrChanged, cbRemoved)
+
     // eslint-disable-next-line no-undef
     delete CodeMirror.keyMap.emacs['Ctrl-V']
 

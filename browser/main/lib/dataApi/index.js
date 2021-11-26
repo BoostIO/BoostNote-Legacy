@@ -1,5 +1,6 @@
 const dataApi = {
   init: require('./init'),
+  addFSWatcherCallback: require('./addFSWatcherCallback'),
   toggleStorage: require('./toggleStorage'),
   addStorage: require('./addStorage'),
   renameStorage: require('./renameStorage'),

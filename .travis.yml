@@ -1,6 +1,6 @@
 language: node_js
 node_js:
-  - 8
+  - 12
 script:
   - npm run lint && npm run test
   - 'if [[ ${TRAVIS_PULL_REQUEST_BRANCH:-$TRAVIS_BRANCH} = "master" ]]; then npm install -g grunt npm@6.4 && grunt pre-build; fi'
