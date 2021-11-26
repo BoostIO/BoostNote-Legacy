@@ -1,7 +1,6 @@
 'use strict'
 
 import sanitizeHtml from 'sanitize-html'
-import { escapeHtmlCharacters } from './utils'
 import url from 'url'
 
 module.exports = function sanitizePlugin(md, options) {
@@ -17,9 +16,11 @@ module.exports = function sanitizePlugin(md, options) {
       }
       if (state.tokens[tokenIdx].type.match(/.*_fence$/)) {
         // escapeHtmlCharacters has better performance
-        state.tokens[tokenIdx].content = escapeHtmlCharacters(
-          state.tokens[tokenIdx].content,
-          { skipSingleQuote: true }
+        state.tokens[tokenIdx].content = state.tokens[tokenIdx].content.replace(
+          /[\u00A0-\u9999<>\&]/gim,
+          function(i) {
+            return '&#' + i.charCodeAt(0) + ';'
+          }
         )
       }
       if (state.tokens[tokenIdx].type === 'inline') {
