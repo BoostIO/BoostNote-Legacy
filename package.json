@@ -14,7 +14,16 @@
     "fix": "eslint . --fix",
     "lint": "eslint .",
     "dev": "cross-env NODE_ENV=development node dev-scripts/dev.js",
-    "watch": "webpack-dev-server --hot"
+    "watch": "webpack-dev-server --hot",
+    "dist": "electron-builder --publish never"
+  },
+  "build": {
+    "appId": "boostnote",
+    "linux": {
+      "target": [
+        "AppImage"
+      ]
+    }
   },
   "config": {
     "electron-version": "4.2.12"
@@ -150,6 +159,7 @@
     "devtron": "^1.1.0",
     "dom-storage": "^2.0.2",
     "electron": "4",
+    "electron-builder": "^22.3.6",
     "electron-debug": "^2.2.0",
     "electron-devtools-installer": "^2.2.4",
     "electron-packager": "^12.2.0",
