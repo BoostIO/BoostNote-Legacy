@@ -161,7 +161,7 @@
     "eslint-plugin-react": "^7.8.2",
     "eslint-plugin-standard": "^3.0.1",
     "faker": "^3.1.0",
-    "grunt": "^0.4.5",
+    "grunt": "^1.5.3",
     "grunt-electron-installer": "2.1.0",
     "history": "^4.9.0",
     "husky": "^1.1.0",
