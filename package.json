@@ -168,7 +168,7 @@
     "identity-obj-proxy": "^3.0.0",
     "jest": "^22.4.3",
     "jest-localstorage-mock": "^2.2.0",
-    "jsdom": "^9.4.2",
+    "jsdom": "^16.5.0",
     "json-loader": "^0.5.4",
     "markdownlint": "^0.11.0",
     "merge-stream": "^1.0.0",
