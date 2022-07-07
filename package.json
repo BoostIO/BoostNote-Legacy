@@ -97,7 +97,7 @@
     "markdown-toc": "^1.2.0",
     "mdurl": "^1.0.1",
     "mermaid": "^8.5.2",
-    "moment": "^2.10.3",
+    "moment": "^2.29.4",
     "mousetrap": "^1.6.2",
     "mousetrap-global-bind": "^1.1.0",
     "node-ipc": "^8.1.0",
