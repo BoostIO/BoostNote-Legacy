@@ -149,7 +149,7 @@
     "css-loader": "^0.19.0",
     "devtron": "^1.1.0",
     "dom-storage": "^2.0.2",
-    "electron": "4",
+    "electron": "18",
     "electron-debug": "^2.2.0",
     "electron-devtools-installer": "^2.2.4",
     "electron-packager": "^12.2.0",
